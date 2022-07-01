@@ -9,6 +9,18 @@ const geoRouter = express.Router();
 
 geoRouter.use(bodyParser.json());
 
+const dataParser=(data)=>{
+    let newData={}
+    newData.totals={}
+    newData.totals.emloyee= data[0].consultant
+    newData.totals.consultant =data[0].employee
+    newData.regionWise={}
+    console.log(data[0].consultantgeo)
+    newData.regionWise.consultantgeo = data[0].consultantgeo
+    newData.regionWise.employeegeo = data[0].employeegeo
+    return newData
+}
+
 geoRouter.route('/')
 .get((req,res,next) => {
     Geodata.collection.insertMany(jsonData, function(err,r) {
@@ -49,9 +61,10 @@ geoRouter.route('/')
                 }}
               ])
         .then((emp) => {
+            let finalResult = dataParser(emp)
             res.statusCode = 200;
             res.setHeader('Content-Type', 'application/json');
-            res.json(emp);
+            res.json(finalResult);
         }, (err) => next(err))
         .catch((err) => next(err));
     }
@@ -84,9 +97,10 @@ geoRouter.route('/')
                 }}
               ])
         .then((emp) => {
+            let finalResult = dataParser(emp)
             res.statusCode = 200;
             res.setHeader('Content-Type', 'application/json');
-            res.json(emp);
+            res.json(finalResult);
         }, (err) => next(err))
         .catch((err) => next(err));
 
