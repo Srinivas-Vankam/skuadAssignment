@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
 const Geodata = require('../models/employees');
-const jsonData = require('./sample.json')
+const jsonData = []
 
 const geoRouter = express.Router();
 
@@ -19,7 +19,7 @@ geoRouter.route('/')
    
 })
 .post((req, res, next) => {
-    let geo = req.body.input.geography[0]
+    let geo = req.body.input.geography
     if(geo.length){
         Geodata.aggregate(
             [
