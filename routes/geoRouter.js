@@ -20,39 +20,78 @@ geoRouter.route('/')
 })
 .post((req, res, next) => {
     let geo = req.body.input.geography[0]
-    Geodata.aggregate(
-        [
-            { "$facet": {
-                "consultant": [
-                    { "$match" : { contractType: { $in: [ 'CONSULTANT_FIXED' ,'CONSULTANT_VARIABLE' ] } }},
-                    { "$count": "consultant" },
-                ],
-                "employee": [
-                    { "$match" : { contractType:'EMPLOYEE'} },
-                    { "$count": "employee" }
-                ],
-                "consultantgeo": [
-                    { "$match" : { contractType: { $in: [ 'CONSULTANT_FIXED' ,'CONSULTANT_VARIABLE' ] },geography:{ $in: req.body.input.geography}}},
-                    { $group: { _id: '$geography', consultant: { $sum: 1 } } }
-                ],
-                "employeegeo": [
-                    { "$match" : { contractType:'EMPLOYEE',geography:{ $in: req.body.input.geography}} },
-                    { $group: { _id: '$geography', employee: { $sum: 1 } } }
-                ]
-            }},
-            { "$project": {
-                "consultant": { "$arrayElemAt": ["$consultant.consultant", 0] },
-                "employee": { "$arrayElemAt": ["$employee.employee", 0] },
-                "employeegeo": 1,
-                "consultantgeo": 1
-            }}
-          ])
-    .then((emp) => {
-        res.statusCode = 200;
-        res.setHeader('Content-Type', 'application/json');
-        res.json(emp);
-    }, (err) => next(err))
-    .catch((err) => next(err));
+    if(geo.length){
+        Geodata.aggregate(
+            [
+                { "$facet": {
+                    "consultant": [
+                        { "$match" : { contractType: { $in: [ 'CONSULTANT_FIXED' ,'CONSULTANT_VARIABLE' ] } }},
+                        { "$count": "consultant" },
+                    ],
+                    "employee": [
+                        { "$match" : { contractType:'EMPLOYEE'} },
+                        { "$count": "employee" }
+                    ],
+                    "consultantgeo": [
+                        { "$match" : { contractType: { $in: [ 'CONSULTANT_FIXED' ,'CONSULTANT_VARIABLE' ] },geography:{ $in: req.body.input.geography}}},
+                        { $group: { _id: '$geography', consultant: { $sum: 1 } } }
+                    ],
+                    "employeegeo": [
+                        { "$match" : { contractType:'EMPLOYEE',geography:{ $in: req.body.input.geography}} },
+                        { $group: { _id: '$geography', employee: { $sum: 1 } } }
+                    ]
+                }},
+                { "$project": {
+                    "consultant": { "$arrayElemAt": ["$consultant.consultant", 0] },
+                    "employee": { "$arrayElemAt": ["$employee.employee", 0] },
+                    "employeegeo": 1,
+                    "consultantgeo": 1
+                }}
+              ])
+        .then((emp) => {
+            res.statusCode = 200;
+            res.setHeader('Content-Type', 'application/json');
+            res.json(emp);
+        }, (err) => next(err))
+        .catch((err) => next(err));
+    }
+    else{
+        Geodata.aggregate(
+            [
+                { "$facet": {
+                    "consultant": [
+                        { "$match" : { contractType: { $in: [ 'CONSULTANT_FIXED' ,'CONSULTANT_VARIABLE' ] } }},
+                        { "$count": "consultant" },
+                    ],
+                    "employee": [
+                        { "$match" : { contractType:'EMPLOYEE'} },
+                        { "$count": "employee" }
+                    ],
+                    "consultantgeo": [
+                        { "$match" : { contractType: { $in: [ 'CONSULTANT_FIXED' ,'CONSULTANT_VARIABLE' ] }}},
+                        { $group: { _id: '$geography', consultant: { $sum: 1 } } }
+                    ],
+                    "employeegeo": [
+                        { "$match" : { contractType:'EMPLOYEE'} },
+                        { $group: { _id: '$geography', employee: { $sum: 1 } } }
+                    ]
+                }},
+                { "$project": {
+                    "consultant": { "$arrayElemAt": ["$consultant.consultant", 0] },
+                    "employee": { "$arrayElemAt": ["$employee.employee", 0] },
+                    "employeegeo": 1,
+                    "consultantgeo": 1
+                }}
+              ])
+        .then((emp) => {
+            res.statusCode = 200;
+            res.setHeader('Content-Type', 'application/json');
+            res.json(emp);
+        }, (err) => next(err))
+        .catch((err) => next(err));
+
+    }
+    
 })
 
 
